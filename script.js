@@ -99,12 +99,15 @@ function renderMessages() {
             
             // Jika ada file attachment
             if (msg.file) {
+                const filePreview = msg.file.type.startsWith('image/') ? 
+                    `<img src="${msg.file.url}" alt="${msg.file.name}" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-bottom: 8px; display: block;">` :
+                    msg.file.type.startsWith('video/') ?
+                    `<video src="${msg.file.url}" controls style="max-width: 250px; max-height: 200px; border-radius: 8px; margin-bottom: 8px; display: block;"></video>` :
+                    `<div class="file-icon">${msg.file.icon || '📄'} ${msg.file.name} (${(msg.file.size / 1024).toFixed(2)} KB)</div>`;
+                
                 content = `
                     <div class="file-attachment">
-                        ${msg.file.type.startsWith('image/') ? 
-                            `<img src="${msg.file.url}" alt="Uploaded image" style="max-width: 200px; border-radius: 8px; margin-bottom: 8px;">` :
-                            `<div class="file-icon">📎 ${msg.file.name}</div>`
-                        }
+                        ${filePreview}
                     </div>
                     ${msg.text}
                 `;
@@ -566,12 +569,20 @@ function toggleAttachmentMenu() {
 }
 
 function triggerFileUpload() {
+    // Support semua tipe file
     document.getElementById('fileInput').click();
     toggleAttachmentMenu();
 }
 
 function triggerCamera() {
+    // Langsung buka kamera untuk foto
     document.getElementById('cameraInput').click();
+    toggleAttachmentMenu();
+}
+
+function triggerGallery() {
+    // Buka galeri untuk pilih foto/video
+    document.getElementById('galleryInput').click();
     toggleAttachmentMenu();
 }
 
@@ -579,16 +590,10 @@ async function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
     
-    // Validasi ukuran (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-        alert('❌ File terlalu besar! Maksimal 10MB');
-        return;
-    }
-    
-    // Validasi tipe file
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'application/pdf', 'text/plain'];
-    if (!allowedTypes.includes(file.type)) {
-        alert('❌ Tipe file tidak didukung!');
+    // Validasi ukuran (max 50MB untuk support video)
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    if (file.size > maxSize) {
+        alert('❌ File terlalu besar! Maksimal 50MB');
         return;
     }
     
@@ -596,16 +601,43 @@ async function handleFileUpload(event) {
         // Convert to base64
         const base64 = await fileToBase64(file);
         
+        // Determine file type description
+        let fileType = 'file';
+        let fileIcon = '📄';
+        if (file.type.startsWith('image/')) {
+            fileType = 'gambar';
+            fileIcon = '🖼️';
+        } else if (file.type.startsWith('video/')) {
+            fileType = 'video';
+            fileIcon = '🎬';
+        } else if (file.type.startsWith('audio/')) {
+            fileType = 'audio';
+            fileIcon = '🎵';
+        } else if (file.type.includes('pdf')) {
+            fileType = 'PDF';
+            fileIcon = '📕';
+        } else if (file.type.includes('document') || file.type.includes('word')) {
+            fileType = 'dokumen';
+            fileIcon = '📝';
+        } else if (file.type.includes('sheet') || file.type.includes('excel')) {
+            fileType = 'spreadsheet';
+            fileIcon = '📊';
+        } else if (file.type.includes('zip') || file.type.includes('rar')) {
+            fileType = 'arsip';
+            fileIcon = '🗜️';
+        }
+        
         // Create message with file
         const fileMsg = {
             id: Date.now(),
             type: 'user',
-            text: `Saya mengirim file: ${file.name}`,
+            text: `Saya mengirim ${fileType}: ${file.name}`,
             file: {
                 name: file.name,
                 type: file.type,
                 size: file.size,
-                url: base64
+                url: base64,
+                icon: fileIcon
             },
             timestamp: new Date().toISOString()
         };
@@ -614,7 +646,7 @@ async function handleFileUpload(event) {
         
         // Update title if first message
         if (chats[currentChatId].messages.length === 2) {
-            chats[currentChatId].title = `File: ${file.name.substring(0, 20)}`;
+            chats[currentChatId].title = `${fileIcon} ${file.name.substring(0, 20)}`;
         }
         
         renderMessages();
@@ -629,8 +661,10 @@ async function handleFileUpload(event) {
                 prompt = `Saya baru saja mengunggah gambar bernama "${file.name}". Bisakah kamu membantu menganalisis atau memberikan informasi tentang gambar ini?`;
             } else if (file.type.startsWith('video/')) {
                 prompt = `Saya baru saja mengunggah video bernama "${file.name}" dengan ukuran ${(file.size / 1024 / 1024).toFixed(2)} MB. Bisakah kamu memberikan informasi tentang video ini?`;
+            } else if (file.type.includes('pdf')) {
+                prompt = `Saya baru saja mengunggah dokumen PDF "${file.name}". Bisakah kamu membantu dengan dokumen ini?`;
             } else {
-                prompt = `Saya baru saja mengunggah file "${file.name}" (${file.type}). Bisakah kamu membantu?`;
+                prompt = `Saya baru saja mengunggah file "${file.name}" (${fileType}, ${(file.size / 1024).toFixed(2)} KB). Bisakah kamu membantu?`;
             }
             
             const response = await getAIResponse(prompt);
