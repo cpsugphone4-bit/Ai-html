@@ -64,8 +64,9 @@
 
             <div class="input-area">
                 <!-- File inputs (hidden) -->
-                <input type="file" id="fileInput" accept="image/*,video/*,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event)">
+                <input type="file" id="fileInput" accept="*/*" style="display: none;" onchange="handleFileUpload(event)">
                 <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleFileUpload(event)">
+                <input type="file" id="galleryInput" accept="image/*,video/*" style="display: none;" onchange="handleFileUpload(event)">
                 
                 <div class="input-wrapper">
                     <!-- Plus button untuk attachment menu -->
@@ -81,9 +82,9 @@
                         </button>
                         <button class="menu-item" onclick="triggerCamera()">
                             <span class="menu-icon">📷</span>
-                            <span class="menu-text">Kamera</span>
+                            <span class="menu-text">Foto</span>
                         </button>
-                        <button class="menu-item" onclick="triggerFileUpload()">
+                        <button class="menu-item" onclick="triggerGallery()">
                             <span class="menu-icon">🖼️</span>
                             <span class="menu-text">Galeri</span>
                         </button>
@@ -107,4 +108,4 @@
 
     <script src="script.js"></script>
 </body>
-</html>
+    </html>
