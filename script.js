@@ -1,17 +1,10 @@
-// script.js - VERSI AMAN
-// File ini TETAP ADA, tapi TIDAK ADA API KEYS lagi!
+// script.js - VERSI LENGKAP dengan Upload & Model Switch
 
 // State Management
 let chats = {};
 let currentChatId = null;
 let currentModel = 'deepseek';
 let isTyping = false;
-
-// ============================================
-// ❌ HAPUS INI (API KEYS TIDAK BOLEH DI SINI!)
-// ============================================
-// const OPENROUTER_API_KEY = 'sk-or-v1-xxx'; ❌ HAPUS!
-// const GEMINI_API_KEY = 'AIzaSyxxx'; ❌ HAPUS!
 
 // Initialize
 function init() {
@@ -25,6 +18,7 @@ function createNewChat() {
         id: chatId,
         title: 'Chat Baru',
         date: new Date().toISOString(),
+        model: currentModel,
         messages: [
             {
                 id: 1,
@@ -52,8 +46,14 @@ function renderChatList() {
         const date = new Date(chat.date);
         const dateStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
         
+        const modelIcons = {
+            'deepseek': '🧠',
+            'dolphin': '🐬',
+            'gemini': '✨'
+        };
+        
         chatItem.innerHTML = `
-            <div class="chat-title">✨ ${chat.title}</div>
+            <div class="chat-title">${modelIcons[chat.model] || '🤖'} ${chat.title}</div>
             <div class="chat-date">${dateStr}</div>
         `;
         
@@ -64,6 +64,8 @@ function renderChatList() {
 // Switch Chat
 function switchChat(chatId) {
     currentChatId = chatId;
+    currentModel = chats[chatId].model;
+    updateModelDisplay();
     renderChatList();
     renderMessages();
 }
@@ -80,13 +82,36 @@ function renderMessages() {
         messageDiv.className = `message ${msg.type}`;
         
         if (msg.type === 'bot') {
+            // Process message untuk detect code blocks
+            const processedText = processMessageWithCode(msg.text);
+            
             messageDiv.innerHTML = `
                 <div class="bot-avatar">✨</div>
-                <div class="message-content">${msg.text}</div>
+                <div class="message-content">${processedText}</div>
             `;
-        } else {
+        } else if (msg.type === 'system') {
+            messageDiv.className = 'message system';
             messageDiv.innerHTML = `
-                <div class="message-content">${msg.text}</div>
+                <div class="system-message">${msg.text}</div>
+            `;
+        } else if (msg.type === 'user') {
+            let content = msg.text;
+            
+            // Jika ada file attachment
+            if (msg.file) {
+                content = `
+                    <div class="file-attachment">
+                        ${msg.file.type.startsWith('image/') ? 
+                            `<img src="${msg.file.url}" alt="Uploaded image" style="max-width: 200px; border-radius: 8px; margin-bottom: 8px;">` :
+                            `<div class="file-icon">📎 ${msg.file.name}</div>`
+                        }
+                    </div>
+                    ${msg.text}
+                `;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">${content}</div>
             `;
         }
         
@@ -94,6 +119,83 @@ function renderMessages() {
     });
     
     container.scrollTop = container.scrollHeight;
+}
+
+// Process message untuk detect dan format code blocks
+function processMessageWithCode(text) {
+    // Escape HTML untuk keamanan
+    const escapeHtml = (str) => {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    };
+    
+    // Detect code blocks dengan ```
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    
+    let processed = text;
+    let match;
+    let codeBlockIndex = 0;
+    
+    // Replace code blocks dengan formatted version
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+        const language = match[1] || 'text';
+        const code = match[2].trim();
+        const codeId = `code-${Date.now()}-${codeBlockIndex++}`;
+        
+        const codeBlock = `
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">${language}</span>
+                    <button class="copy-code-btn" onclick="copyCode('${codeId}')" title="Salin kode">
+                        <span class="copy-icon">📋</span>
+                        <span class="copy-text">Salin</span>
+                    </button>
+                </div>
+                <pre class="code-content"><code id="${codeId}" class="language-${language}">${escapeHtml(code)}</code></pre>
+            </div>
+        `;
+        
+        processed = processed.replace(match[0], codeBlock);
+    }
+    
+    // Detect inline code dengan `code`
+    const inlineCodeRegex = /`([^`]+)`/g;
+    processed = processed.replace(inlineCodeRegex, '<code class="inline-code">$1</code>');
+    
+    // Convert newlines ke <br> untuk teks biasa (kecuali di dalam code blocks)
+    const parts = processed.split(/(<div class="code-block">[\s\S]*?<\/div>)/);
+    processed = parts.map((part, index) => {
+        if (index % 2 === 0) {
+            // Bukan code block, convert newlines
+            return part.replace(/\n/g, '<br>');
+        }
+        return part;
+    }).join('');
+    
+    return processed;
+}
+
+// Copy code function
+function copyCode(codeId) {
+    const codeElement = document.getElementById(codeId);
+    const code = codeElement.textContent;
+    
+    navigator.clipboard.writeText(code).then(() => {
+        // Visual feedback
+        const btn = event.target.closest('.copy-code-btn');
+        const originalHTML = btn.innerHTML;
+        
+        btn.innerHTML = '<span class="copy-icon">✓</span><span class="copy-text">Tersalin!</span>';
+        btn.style.background = '#10b981';
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+        }, 2000);
+    }).catch(err => {
+        alert('Gagal menyalin: ' + err);
+    });
 }
 
 // Send Message
@@ -152,11 +254,7 @@ async function sendMessage() {
     }
 }
 
-// ============================================
-// ✅ FUNGSI INI YANG DIUBAH!
-// Sekarang panggil /api/chat (serverless function)
-// BUKAN langsung ke OpenRouter/Gemini
-// ============================================
+// Get AI Response
 async function getAIResponse(userMessage) {
     const messages = chats[currentChatId].messages;
     const history = messages.slice(-6).filter(m => m.type !== 'system').map(m => ({
@@ -164,7 +262,6 @@ async function getAIResponse(userMessage) {
         content: m.text
     }));
 
-    // Siapkan messages untuk dikirim
     const messagesToSend = [
         { 
             role: 'system', 
@@ -177,8 +274,6 @@ async function getAIResponse(userMessage) {
         }
     ];
 
-    // ✅ PANGGIL SERVERLESS FUNCTION, BUKAN LANGSUNG KE API!
-    // Ini akan ke /api/chat.js yang ada di server Vercel
     const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -186,7 +281,7 @@ async function getAIResponse(userMessage) {
         },
         body: JSON.stringify({
             messages: messagesToSend,
-            model: currentModel  // 'deepseek', 'dolphin', atau 'gemini'
+            model: currentModel
         })
     });
 
@@ -196,7 +291,7 @@ async function getAIResponse(userMessage) {
     }
 
     const data = await response.json();
-    return data.message;  // Return response dari server
+    return data.message;
 }
 
 // Show/Hide Typing
@@ -293,7 +388,164 @@ function handleSwipe() {
     }
 }
 
-// Close sidebar when clicking overlay
+// Model Selector Functions
+function toggleModelDropdown() {
+    document.getElementById('modelDropdown').classList.toggle('show');
+}
+
+function updateModelDisplay() {
+    const modelInfo = {
+        'deepseek': { icon: '🧠', name: 'DeepSeek Chat' },
+        'dolphin': { icon: '🐬', name: 'Dolphin Mistral' },
+        'gemini': { icon: '✨', name: 'Gemini Pro' }
+    };
+    
+    const info = modelInfo[currentModel];
+    document.getElementById('currentModelIcon').textContent = info.icon;
+    document.getElementById('currentModelName').textContent = info.name;
+}
+
+async function selectModel(model, icon, name) {
+    const oldModel = currentModel;
+    currentModel = model;
+    
+    // Update chat model
+    chats[currentChatId].model = model;
+    
+    // Update display
+    updateModelDisplay();
+    
+    // Update active state
+    document.querySelectorAll('.model-option').forEach(opt => {
+        opt.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+    
+    toggleModelDropdown();
+    
+    // Add system message tanpa hapus chat
+    const systemMsg = {
+        id: Date.now(),
+        type: 'system',
+        text: `✨ Model diubah ke ${name}`,
+        timestamp: new Date().toISOString()
+    };
+    
+    chats[currentChatId].messages.push(systemMsg);
+    renderMessages();
+    renderChatList();
+}
+
+// File Upload Functions
+function triggerFileUpload() {
+    document.getElementById('fileInput').click();
+}
+
+function triggerCamera() {
+    document.getElementById('cameraInput').click();
+}
+
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validasi ukuran (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        alert('❌ File terlalu besar! Maksimal 10MB');
+        return;
+    }
+    
+    // Validasi tipe file
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'application/pdf', 'text/plain'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('❌ Tipe file tidak didukung!');
+        return;
+    }
+    
+    try {
+        // Convert to base64
+        const base64 = await fileToBase64(file);
+        
+        // Create message with file
+        const fileMsg = {
+            id: Date.now(),
+            type: 'user',
+            text: `Saya mengirim file: ${file.name}`,
+            file: {
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                url: base64
+            },
+            timestamp: new Date().toISOString()
+        };
+        
+        chats[currentChatId].messages.push(fileMsg);
+        
+        // Update title if first message
+        if (chats[currentChatId].messages.length === 2) {
+            chats[currentChatId].title = `File: ${file.name.substring(0, 20)}`;
+        }
+        
+        renderMessages();
+        renderChatList();
+        
+        // Get AI response about the file
+        showTypingIndicator();
+        
+        try {
+            let prompt = '';
+            if (file.type.startsWith('image/')) {
+                prompt = `Saya baru saja mengunggah gambar bernama "${file.name}". Bisakah kamu membantu menganalisis atau memberikan informasi tentang gambar ini?`;
+            } else if (file.type.startsWith('video/')) {
+                prompt = `Saya baru saja mengunggah video bernama "${file.name}" dengan ukuran ${(file.size / 1024 / 1024).toFixed(2)} MB. Bisakah kamu memberikan informasi tentang video ini?`;
+            } else {
+                prompt = `Saya baru saja mengunggah file "${file.name}" (${file.type}). Bisakah kamu membantu?`;
+            }
+            
+            const response = await getAIResponse(prompt);
+            
+            const botMsg = {
+                id: Date.now() + 1,
+                type: 'bot',
+                text: response,
+                timestamp: new Date().toISOString()
+            };
+            
+            chats[currentChatId].messages.push(botMsg);
+            hideTypingIndicator();
+            renderMessages();
+        } catch (error) {
+            hideTypingIndicator();
+            const errorMsg = {
+                id: Date.now() + 1,
+                type: 'bot',
+                text: `❌ Maaf, terjadi kesalahan: ${error.message}`,
+                timestamp: new Date().toISOString()
+            };
+            chats[currentChatId].messages.push(errorMsg);
+            renderMessages();
+        }
+        
+    } catch (error) {
+        alert('❌ Gagal memproses file: ' + error.message);
+    }
+    
+    // Reset input
+    event.target.value = '';
+}
+
+// Convert file to base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('overlay').onclick = toggleSidebar;
     
@@ -305,36 +557,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     init();
 });
-
-// Model Selector
-function toggleModelDropdown() {
-    document.getElementById('modelDropdown').classList.toggle('show');
-}
-
-function selectModel(model, icon, name, desc) {
-    currentModel = model;
-    document.getElementById('currentModelIcon').textContent = icon;
-    document.getElementById('currentModelName').textContent = name;
-    
-    document.querySelectorAll('.model-option').forEach(opt => {
-        opt.classList.remove('active');
-    });
-    event.currentTarget.classList.add('active');
-    
-    toggleModelDropdown();
-}
-
-/*
-PENJELASAN PERUBAHAN:
-
-SEBELUM (Tidak Aman):
-- Ada API keys di file ini
-- Langsung fetch ke OpenRouter/Gemini
-- User bisa lihat API keys di browser
-
-SESUDAH (Aman):
-- TIDAK ADA API keys di file ini
-- Fetch ke /api/chat (serverless function)
-- API keys tersimpan di server Vercel
-- User TIDAK BISA lihat API keys
-*/
