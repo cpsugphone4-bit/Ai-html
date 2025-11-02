@@ -198,6 +198,129 @@ function copyCode(codeId) {
     });
 }
 
+// Simple syntax highlighting
+function highlightCode(code, language) {
+    if (!language || language === 'text') {
+        return code;
+    }
+    
+    let highlighted = code;
+    
+    // JavaScript/TypeScript
+    if (language === 'javascript' || language === 'js' || language === 'typescript' || language === 'ts') {
+        highlighted = highlighted
+            .replace(/\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|class|extends|import|export|from|default|async|await|try|catch|throw|new)\b/g, '<span style="color: #569cd6">$1</span>')
+            .replace(/\b(true|false|null|undefined|NaN|Infinity)\b/g, '<span style="color: #569cd6">$1</span>')
+            .replace(/(".*?"|'.*?'|`.*?`)/g, '<span style="color: #ce9178">$1</span>')
+            .replace(/\/\/.*/g, '<span style="color: #6a9955">$&</span>')
+            .replace(/\b(\d+)\b/g, '<span style="color: #b5cea8">$1</span>');
+    }
+    
+    // Python
+    if (language === 'python' || language === 'py') {
+        highlighted = highlighted
+            .replace(/\b(def|class|if|elif|else|for|while|return|import|from|as|try|except|finally|with|lambda|yield|pass|break|continue|raise|assert|and|or|not|in|is|None|True|False)\b/g, '<span style="color: #569cd6">$1</span>')
+            .replace(/(".*?"|'.*?'|"""[\s\S]*?""")/g, '<span style="color: #ce9178">$1</span>')
+            .replace(/#.*/g, '<span style="color: #6a9955">$&</span>')
+            .replace(/\b(\d+)\b/g, '<span style="color: #b5cea8">$1</span>');
+    }
+    
+    // HTML
+    if (language === 'html' || language === 'xml') {
+        highlighted = highlighted
+            .replace(/&lt;(\/?[\w-]+)/g, '<span style="color: #569cd6">&lt;$1</span>')
+            .replace(/([\w-]+)=/g, '<span style="color: #9cdcfe">$1</span>=')
+            .replace(/=(".*?"|'.*?')/g, '=<span style="color: #ce9178">$1</span>')
+            .replace(/&gt;/g, '<span style="color: #569cd6">&gt;</span>');
+    }
+    
+    // CSS
+    if (language === 'css' || language === 'scss') {
+        highlighted = highlighted
+            .replace(/([.#]?[\w-]+)\s*{/g, '<span style="color: #d7ba7d">$1</span> {')
+            .replace(/([\w-]+):/g, '<span style="color: #9cdcfe">$1</span>:')
+            .replace(/:\s*([^;]+);/g, ': <span style="color: #ce9178">$1</span>;')
+            .replace(/\/\*[\s\S]*?\*\//g, '<span style="color: #6a9955">$&</span>');
+    }
+    
+    // JSON
+    if (language === 'json') {
+        highlighted = highlighted
+            .replace(/"(.*?)":/g, '<span style="color: #9cdcfe">"$1"</span>:')
+            .replace(/:\s*"(.*?)"/g, ': <span style="color: #ce9178">"$1"</span>')
+            .replace(/:\s*(\d+)/g, ': <span style="color: #b5cea8">$1</span>')
+            .replace(/:\s*(true|false|null)/g, ': <span style="color: #569cd6">$1</span>');
+    }
+    
+    return highlighted;
+}
+
+// Process message untuk detect dan format code blocks
+function processMessageWithCode(text) {
+    // Escape HTML untuk keamanan
+    const escapeHtml = (str) => {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    };
+    
+    // Detect code blocks dengan ```
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    
+    let processed = text;
+    let match;
+    let codeBlockIndex = 0;
+    
+    // Replace code blocks dengan formatted version
+    const matches = [];
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+        matches.push({
+            fullMatch: match[0],
+            language: match[1] || 'text',
+            code: match[2].trim(),
+            index: match.index
+        });
+    }
+    
+    // Process dari belakang agar index tetap valid
+    matches.reverse().forEach(match => {
+        const codeId = `code-${Date.now()}-${codeBlockIndex++}`;
+        const escapedCode = escapeHtml(match.code);
+        const highlightedCode = highlightCode(escapedCode, match.language);
+        
+        const codeBlock = `
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">${match.language}</span>
+                    <button class="copy-code-btn" onclick="copyCode('${codeId}')" title="Salin kode">
+                        <span class="copy-icon">📋</span>
+                        <span class="copy-text">Salin</span>
+                    </button>
+                </div>
+                <pre class="code-content"><code id="${codeId}" class="language-${match.language}">${highlightedCode}</code></pre>
+            </div>
+        `;
+        
+        processed = processed.substring(0, match.index) + codeBlock + processed.substring(match.index + match.fullMatch.length);
+    });
+    
+    // Detect inline code dengan `code`
+    const inlineCodeRegex = /`([^`]+)`/g;
+    processed = processed.replace(inlineCodeRegex, '<code class="inline-code">$1</code>');
+    
+    // Convert newlines ke <br> untuk teks biasa (kecuali di dalam code blocks)
+    const parts = processed.split(/(<div class="code-block">[\s\S]*?<\/div>)/);
+    processed = parts.map((part, index) => {
+        if (index % 2 === 0) {
+            // Bukan code block, convert newlines
+            return part.replace(/\n/g, '<br>');
+        }
+        return part;
+    }).join('');
+    
+    return processed;
+}
+
 // Send Message
 async function sendMessage() {
     const input = document.getElementById('messageInput');
