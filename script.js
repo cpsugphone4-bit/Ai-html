@@ -560,12 +560,19 @@ async function selectModel(model, icon, name) {
 }
 
 // File Upload Functions
+function toggleAttachmentMenu() {
+    const menu = document.getElementById('attachmentMenu');
+    menu.classList.toggle('show');
+}
+
 function triggerFileUpload() {
     document.getElementById('fileInput').click();
+    toggleAttachmentMenu();
 }
 
 function triggerCamera() {
     document.getElementById('cameraInput').click();
+    toggleAttachmentMenu();
 }
 
 async function handleFileUpload(event) {
@@ -673,8 +680,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('overlay').onclick = toggleSidebar;
     
     document.addEventListener('click', function(e) {
+        // Close model dropdown
         if (!e.target.closest('.model-selector')) {
             document.getElementById('modelDropdown').classList.remove('show');
+        }
+        
+        // Close attachment menu
+        if (!e.target.closest('.input-wrapper') && !e.target.closest('.plus-btn')) {
+            const menu = document.getElementById('attachmentMenu');
+            if (menu) menu.classList.remove('show');
         }
     });
     
