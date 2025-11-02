@@ -11,11 +11,14 @@ body {
     height: 100vh;
     overflow: hidden;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Safe area untuk Android navigation bar */
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .container {
     display: flex;
     height: 100vh;
+    height: calc(100vh - env(safe-area-inset-bottom));
     max-width: 1400px;
     margin: 0 auto;
     background: white;
@@ -343,39 +346,119 @@ body {
     margin-bottom: 6px;
 }
 
-/* Code Blocks */
-.code-block {
-    background: #1e1e1e;
+/* Code Artifact Blocks (Collapsible) */
+.code-artifact {
+    background: white;
+    border: 1px solid #e0e0e0;
     border-radius: 12px;
     margin: 12px 0;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
 }
 
-.code-header {
-    background: #2d2d2d;
-    padding: 10px 16px;
+.code-artifact:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.artifact-header {
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #3d3d3d;
+    cursor: pointer;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background 0.2s;
 }
 
-.code-language {
-    color: #9cdcfe;
-    font-size: 12px;
+.artifact-header:hover {
+    background: #f0f0f0;
+}
+
+.artifact-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.artifact-icon {
+    font-size: 24px;
+}
+
+.artifact-details {
+    flex: 1;
+}
+
+.artifact-name {
     font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.artifact-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+}
+
+.artifact-language {
+    color: #667eea;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.copy-code-btn {
+.artifact-status {
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.artifact-status::before {
+    content: '●';
+    font-size: 8px;
+}
+
+.artifact-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: #666;
+    font-size: 12px;
+    transition: transform 0.3s;
+}
+
+.artifact-content {
+    max-height: 600px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.artifact-content.collapsed {
+    max-height: 0;
+}
+
+.code-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.code-action-btn {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(102, 126, 234, 0.2);
-    border: 1px solid rgba(102, 126, 234, 0.3);
-    color: #9cdcfe;
+    background: white;
+    border: 1px solid #e0e0e0;
+    color: #666;
     padding: 6px 12px;
     border-radius: 6px;
     font-size: 12px;
@@ -383,76 +466,58 @@ body {
     transition: all 0.2s;
 }
 
-.copy-code-btn:hover {
-    background: rgba(102, 126, 234, 0.3);
-    border-color: rgba(102, 126, 234, 0.5);
+.code-action-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
     transform: translateY(-1px);
 }
 
-.copy-code-btn:active {
+.code-action-btn:active {
     transform: translateY(0);
 }
 
-.copy-icon {
+.action-icon {
     font-size: 14px;
 }
 
-.copy-text {
+.action-text {
     font-weight: 500;
 }
 
-.code-content {
+.code-pre {
     margin: 0;
     padding: 16px;
     overflow-x: auto;
+    background: #1e1e1e;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     font-size: 13px;
     line-height: 1.6;
 }
 
-.code-content code {
+.code-pre code {
     color: #d4d4d4;
     background: none;
     padding: 0;
     border-radius: 0;
-}
-
-/* Inline Code */
-.inline-code {
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 0.9em;
-    border: 1px solid rgba(102, 126, 234, 0.2);
-}
-
-/* Syntax Highlighting Colors */
-.code-content code {
     display: block;
 }
 
-/* Make code selectable and copyable */
-.code-content code::selection {
-    background: rgba(102, 126, 234, 0.3);
-}
-
-/* Scrollbar untuk code blocks */
-.code-content::-webkit-scrollbar {
+/* Scrollbar untuk code */
+.code-pre::-webkit-scrollbar {
     height: 8px;
 }
 
-.code-content::-webkit-scrollbar-track {
+.code-pre::-webkit-scrollbar-track {
     background: #2d2d2d;
 }
 
-.code-content::-webkit-scrollbar-thumb {
+.code-pre::-webkit-scrollbar-thumb {
     background: #4d4d4d;
     border-radius: 4px;
 }
 
-.code-content::-webkit-scrollbar-thumb:hover {
+.code-pre::-webkit-scrollbar-thumb:hover {
     background: #5d5d5d;
 }
 
@@ -502,7 +567,8 @@ body {
 
 /* Input Area */
 .input-area {
-    padding: 15px 25px 20px 25px;
+    padding: 15px 25px;
+    padding-bottom: calc(15px + env(safe-area-inset-bottom));
     border-top: 1px solid #e0e0e0;
     background: white;
 }
@@ -516,6 +582,7 @@ body {
     border-radius: 24px;
     border: 2px solid #e0e0e0;
     transition: all 0.2s;
+    position: relative;
 }
 
 .input-wrapper:focus-within {
@@ -523,38 +590,85 @@ body {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.attachment-buttons {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-}
-
-.attach-btn {
-    background: none;
+/* Plus Button */
+.plus-btn {
+    background: #667eea;
     border: none;
+    color: white;
     font-size: 20px;
     cursor: pointer;
-    padding: 6px;
-    border-radius: 8px;
+    padding: 8px;
+    border-radius: 50%;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
 }
 
-.attach-btn:hover {
-    background: rgba(102, 126, 234, 0.1);
-    transform: scale(1.1);
+.plus-btn:hover {
+    background: #5568d3;
+    transform: scale(1.1) rotate(90deg);
 }
 
-.attach-btn:active {
-    transform: scale(0.95);
+.plus-btn:active {
+    transform: scale(0.95) rotate(90deg);
 }
 
-.camera-btn {
-    font-size: 22px;
+/* Attachment Menu */
+.attachment-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    display: none;
+    flex-direction: column;
+    min-width: 140px;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.attachment-menu.show {
+    display: flex;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-item:hover {
+    background: #f8f9fa;
+}
+
+.menu-item:active {
+    background: #f0f0f0;
+}
+
+.menu-icon {
+    font-size: 20px;
+}
+
+.menu-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
 }
 
 .message-input {
@@ -613,56 +727,69 @@ body {
         height: 50px;
     }
     
-    .attach-btn {
-        font-size: 18px;
-        width: 28px;
-        height: 28px;
-    }
-    
-    .camera-btn {
-        font-size: 20px;
-    }
-    
     .messages-container {
         padding: 15px 15px 10px 15px;
     }
     
     .input-area {
-        padding: 12px 15px 15px 15px;
+        padding: 12px 15px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom));
     }
     
-    /* Code blocks di mobile */
-    .code-block {
+    /* Code artifact di mobile */
+    .code-artifact {
         margin: 10px 0;
     }
     
-    .code-header {
-        padding: 8px 12px;
-        flex-wrap: wrap;
+    .artifact-header {
+        padding: 12px;
+    }
+    
+    .artifact-icon {
+        font-size: 20px;
+    }
+    
+    .artifact-name {
+        font-size: 13px;
+    }
+    
+    .artifact-meta {
+        font-size: 11px;
         gap: 8px;
     }
     
-    .code-language {
-        font-size: 11px;
+    .code-actions {
+        padding: 10px 12px;
+        gap: 6px;
+        flex-wrap: wrap;
     }
     
-    .copy-code-btn {
+    .code-action-btn {
         padding: 5px 10px;
         font-size: 11px;
     }
     
-    .copy-icon {
-        font-size: 12px;
-    }
-    
-    .code-content {
+    .code-pre {
         padding: 12px;
         font-size: 12px;
     }
     
-    .inline-code {
-        font-size: 0.85em;
-        padding: 1px 4px;
+    .plus-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+    
+    .menu-item {
+        padding: 10px 14px;
+    }
+    
+    .menu-icon {
+        font-size: 18px;
+    }
+    
+    .menu-text {
+        font-size: 13px;
     }
 }
 
