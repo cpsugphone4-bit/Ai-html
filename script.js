@@ -405,24 +405,46 @@ async function getAIResponse(userMessage) {
         }
     ];
 
-    const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            messages: messagesToSend,
-            model: currentModel
-        })
-    });
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: messagesToSend,
+                model: currentModel
+            })
+        });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'API request failed');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (!data.message) {
+            throw new Error('Invalid response format from API');
+        }
+        
+        return data.message;
+    } catch (error) {
+        console.error('API Error:', error);
+        
+        // User-friendly error messages
+        if (error.message.includes('Failed to fetch')) {
+            throw new Error('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
+        } else if (error.message.includes('not configured')) {
+            throw new Error('API key belum dikonfigurasi. Hubungi administrator.');
+        } else if (error.message.includes('rate limit')) {
+            throw new Error('Terlalu banyak request. Coba lagi dalam beberapa saat.');
+        } else if (error.message.includes('Unknown model')) {
+            throw new Error(`Model "${currentModel}" tidak dikenali. Coba model lain.`);
+        }
+        
+        throw error;
     }
-
-    const data = await response.json();
-    return data.message;
 }
 
 // Show/Hide Typing
