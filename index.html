@@ -3,7 +3,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>AI Chat Assistant</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -44,17 +47,44 @@
                         <span>▼</span>
                     </button>
                     <div class="model-dropdown" id="modelDropdown">
+                        <div class="model-header">
+                            <span class="model-category">🔓 OpenRouter Free</span>
+                        </div>
                         <div class="model-option active" onclick="selectModel('deepseek', '🧠', 'DeepSeek Chat v3.1')">
                             <div class="model-name">🧠 DeepSeek Chat v3.1</div>
-                            <div class="model-desc">Model reasoning yang cepat dan efisien</div>
+                            <div class="model-desc">Model reasoning cepat dan efisien</div>
                         </div>
                         <div class="model-option" onclick="selectModel('dolphin', '🐬', 'Dolphin Mistral 24B')">
                             <div class="model-name">🐬 Dolphin Mistral 24B</div>
-                            <div class="model-desc">Model open-source dengan uncensored</div>
+                            <div class="model-desc">Uncensored open-source model</div>
                         </div>
-                        <div class="model-option" onclick="selectModel('gemini', '✨', 'Gemini 2.5 Pro')">
-                            <div class="model-name">✨ Gemini 2.5 Pro</div>
-                            <div class="model-desc">Model terbaru Google</div>
+                        <div class="model-option" onclick="selectModel('deepcoder', '💻', 'DeepCoder 14B')">
+                            <div class="model-name">💻 DeepCoder 14B</div>
+                            <div class="model-desc">Specialized coding assistant</div>
+                        </div>
+                        <div class="model-option" onclick="selectModel('mai-ds', '🔬', 'MAI DS R1')">
+                            <div class="model-name">🔬 MAI DS R1</div>
+                            <div class="model-desc">Data science & analysis expert</div>
+                        </div>
+                        <div class="model-option" onclick="selectModel('hermes', '⚡', 'Hermes 3 Llama 405B')">
+                            <div class="model-name">⚡ Hermes 3 Llama 405B</div>
+                            <div class="model-desc">Powerful 405B parameter model</div>
+                        </div>
+                        
+                        <div class="model-header">
+                            <span class="model-category">✨ Google Gemini</span>
+                        </div>
+                        <div class="model-option" onclick="selectModel('gemini-flash', '⚡', 'Gemini 2.0 Flash')">
+                            <div class="model-name">⚡ Gemini 2.0 Flash</div>
+                            <div class="model-desc">Fast & efficient multimodal AI</div>
+                        </div>
+                        <div class="model-option" onclick="selectModel('gemini-flash-exp', '🧪', 'Gemini 2.0 Flash Exp')">
+                            <div class="model-name">🧪 Gemini 2.0 Flash Exp</div>
+                            <div class="model-desc">Experimental cutting-edge features</div>
+                        </div>
+                        <div class="model-option" onclick="selectModel('gemini-pro', '💎', 'Gemini 2.5 Pro')">
+                            <div class="model-name">💎 Gemini 2.5 Pro</div>
+                            <div class="model-desc">Advanced reasoning capabilities</div>
                         </div>
                     </div>
                 </div>
