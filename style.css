@@ -232,12 +232,54 @@ body {
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.15);
     min-width: 320px;
+    max-width: 380px;
     display: none;
     z-index: 100;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 .model-dropdown.show {
     display: block;
+}
+
+/* Scrollbar untuk model dropdown */
+.model-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.model-dropdown::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+
+.model-dropdown::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.model-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+.model-header {
+    padding: 12px 16px;
+    background: linear-gradient(90deg, #f8f9fa 0%, #f0f0f0 100%);
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.model-header:first-child {
+    border-radius: 12px 12px 0 0;
+}
+
+.model-category {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #667eea;
 }
 
 .model-option {
