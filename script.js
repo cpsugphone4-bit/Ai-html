@@ -49,7 +49,12 @@ function renderChatList() {
         const modelIcons = {
             'deepseek': '🧠',
             'dolphin': '🐬',
-            'gemini': '✨'
+            'deepcoder': '💻',
+            'mai-ds': '🔬',
+            'hermes': '⚡',
+            'gemini-flash': '⚡',
+            'gemini-flash-exp': '🧪',
+            'gemini-pro': '💎'
         };
         
         chatItem.innerHTML = `
@@ -523,7 +528,12 @@ function updateModelDisplay() {
     const modelInfo = {
         'deepseek': { icon: '🧠', name: 'DeepSeek Chat' },
         'dolphin': { icon: '🐬', name: 'Dolphin Mistral' },
-        'gemini': { icon: '✨', name: 'Gemini Pro' }
+        'deepcoder': { icon: '💻', name: 'DeepCoder 14B' },
+        'mai-ds': { icon: '🔬', name: 'MAI DS R1' },
+        'hermes': { icon: '⚡', name: 'Hermes 3 405B' },
+        'gemini-flash': { icon: '⚡', name: 'Gemini Flash' },
+        'gemini-flash-exp': { icon: '🧪', name: 'Gemini Flash Exp' },
+        'gemini-pro': { icon: '💎', name: 'Gemini Pro' }
     };
     
     const info = modelInfo[currentModel];
