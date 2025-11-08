@@ -282,6 +282,137 @@ body {
     color: #667eea;
 }
 
+/* System Prompt Editor */
+.dropdown-section {
+    padding: 16px;
+    border-bottom: 2px solid #e0e0e0;
+    background: #f8f9fa;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #333;
+}
+
+.edit-prompt-btn {
+    background: white;
+    border: 1px solid #e0e0e0;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.edit-prompt-btn:hover {
+    background: #667eea;
+    border-color: #667eea;
+    transform: scale(1.05);
+}
+
+.prompt-editor {
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+.prompt-editor.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#systemPromptInput {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+    transition: all 0.2s;
+}
+
+#systemPromptInput:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.prompt-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.prompt-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.prompt-btn.save {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.prompt-btn.save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.prompt-btn.reset {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.prompt-btn.reset:hover {
+    background: #e0e0e0;
+}
+
+.prompt-presets {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.preset-btn {
+    display: inline-block;
+    margin: 4px;
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.preset-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-1px);
+}
+
 .model-option {
     padding: 15px;
     cursor: pointer;
@@ -574,6 +705,63 @@ body {
 
 .code-pre::-webkit-scrollbar-thumb:hover {
     background: #5d5d5d;
+}
+
+/* Gemini Prompt Suggestions */
+.prompt-suggestions {
+    padding: 12px 20px;
+    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+}
+
+.prompt-suggestions::-webkit-scrollbar {
+    height: 4px;
+}
+
+.prompt-suggestions::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.prompt-suggestions::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 2px;
+}
+
+.suggestion-chip {
+    background: white;
+    border: 1px solid #e0e0e0;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    flex-shrink: 0;
+}
+
+.suggestion-chip:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.suggestion-chip:active {
+    transform: translateY(0);
+}
+
+/* Hide suggestions when chat has messages */
+.prompt-suggestions.hidden {
+    display: none;
 }
 
 .bot-avatar {
@@ -894,6 +1082,16 @@ body {
     
     .code-pre {
         padding: 12px;
+        font-size: 12px;
+    }
+    
+    .prompt-suggestions {
+        padding: 10px 12px;
+        gap: 6px;
+    }
+    
+    .suggestion-chip {
+        padding: 8px 14px;
         font-size: 12px;
     }
 }
