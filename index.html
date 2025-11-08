@@ -47,6 +47,37 @@
                         <span>▼</span>
                     </button>
                     <div class="model-dropdown" id="modelDropdown">
+                        <div class="dropdown-section">
+                            <div class="section-header">
+                                <span>⚙️ System Prompt</span>
+                                <button class="edit-prompt-btn" onclick="togglePromptEditor(); event.stopPropagation();">
+                                    ✏️
+                                </button>
+                            </div>
+                            <div class="prompt-editor" id="promptEditor">
+                                <textarea 
+                                    id="systemPromptInput" 
+                                    placeholder="Masukkan system prompt custom..."
+                                    rows="4"
+                                ></textarea>
+                                <div class="prompt-actions">
+                                    <button class="prompt-btn save" onclick="saveSystemPrompt(); event.stopPropagation();">
+                                        💾 Simpan
+                                    </button>
+                                    <button class="prompt-btn reset" onclick="resetSystemPrompt(); event.stopPropagation();">
+                                        🔄 Reset
+                                    </button>
+                                </div>
+                                <div class="prompt-presets">
+                                    <small style="color: #666; display: block; margin-bottom: 8px;">📝 Preset:</small>
+                                    <button class="preset-btn" onclick="usePreset('coding'); event.stopPropagation();">💻 Coding Expert</button>
+                                    <button class="preset-btn" onclick="usePreset('creative'); event.stopPropagation();">🎨 Creative Writer</button>
+                                    <button class="preset-btn" onclick="usePreset('teacher'); event.stopPropagation();">👨‍🏫 Patient Teacher</button>
+                                    <button class="preset-btn" onclick="usePreset('analyst'); event.stopPropagation();">📊 Data Analyst</button>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="model-header">
                             <span class="model-category">🔓 OpenRouter Free</span>
                         </div>
@@ -91,6 +122,34 @@
             </div>
 
             <div class="messages-container" id="messagesContainer"></div>
+
+            <!-- Gemini Prompt Suggestions -->
+            <div class="prompt-suggestions" id="promptSuggestions">
+                <div class="suggestion-chip" onclick="usePrompt('Jelaskan [topik] dengan bahasa sederhana dan contoh')">
+                    💡 Jelaskan konsep
+                </div>
+                <div class="suggestion-chip" onclick="usePrompt('Buatkan code [bahasa pemrograman] untuk [fungsi/fitur]')">
+                    💻 Generate code
+                </div>
+                <div class="suggestion-chip" onclick="usePrompt('Analisis dan bandingkan [A] vs [B]')">
+                    📊 Bandingkan
+                </div>
+                <div class="suggestion-chip" onclick="usePrompt('Berikan tips untuk meningkatkan [skill/kemampuan]')">
+                    🎯 Tips & trik
+                </div>
+                <div class="suggestion-chip" onclick="usePrompt('Buatkan rencana belajar [topik] dalam [waktu]')">
+                    📚 Rencana belajar
+                </div>
+                <div class="suggestion-chip" onclick="usePrompt('Debug dan perbaiki code ini: [paste code]')">
+                    🔧 Debug code
+                </div>
+                <div class="suggestion-chip" onclick="usePrompt('Rangkum artikel/teks ini: [paste text]')">
+                    📝 Rangkum teks
+                </div>
+                <div class="suggestion-chip" onclick="usePrompt('Translate ke [bahasa]: [text]')">
+                    🌐 Translate
+                </div>
+            </div>
 
             <div class="input-area">
                 <!-- File inputs (hidden) -->
@@ -138,4 +197,4 @@
 
     <script src="script.js"></script>
 </body>
-    </html>
+                                                                       </html>
