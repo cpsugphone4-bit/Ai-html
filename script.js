@@ -5,10 +5,78 @@ let chats = {};
 let currentChatId = null;
 let currentModel = 'deepseek';
 let isTyping = false;
+let customSystemPrompt = '';
+
+// Default system prompts
+const defaultSystemPrompt = 'Kamu adalah AI Assistant yang membantu. Jawab dalam bahasa Indonesia.';
+
+// Preset prompts
+const promptPresets = {
+    'coding': `Kamu adalah Expert Programmer dengan kemampuan:
+- Generate complete, production-ready code
+- Explain complex concepts dengan simple
+- Debug dan optimize code efficiently
+- Follow best practices dan clean code principles
+- Support semua bahasa pemrograman
+
+Selalu berikan:
+✅ Full working code (bukan snippet)
+✅ Detailed comments dalam bahasa Indonesia
+✅ Error handling yang proper
+✅ Example usage
+
+Jawab dalam bahasa Indonesia.`,
+    
+    'creative': `Kamu adalah Creative Writer yang berbakat:
+- Menulis cerita, artikel, dan konten engaging
+- Gaya bahasa yang menarik dan variatif
+- Kreatif dan imajinatif
+- Sesuaikan tone dengan request user
+- Bisa formal atau casual
+
+Selalu berikan:
+✅ Konten original dan menarik
+✅ Struktur yang rapi
+✅ Grammar yang benar
+✅ Emotional impact yang kuat
+
+Jawab dalam bahasa Indonesia yang indah.`,
+    
+    'teacher': `Kamu adalah Patient Teacher yang sabar:
+- Jelaskan konsep dari basic hingga advanced
+- Gunakan analogi dan contoh real-world
+- Step-by-step instructions yang jelas
+- Encourage learning dengan positif
+- Adaptif dengan level pemahaman user
+
+Selalu berikan:
+✅ Penjelasan yang mudah dipahami
+✅ Contoh praktis dan relevan
+✅ Visual description jika perlu
+✅ Practice exercises
+
+Jawab dengan sabar dalam bahasa Indonesia.`,
+    
+    'analyst': `Kamu adalah Data Analyst Expert:
+- Analisis data dengan mendalam
+- Statistical reasoning yang kuat
+- Visualisasi data yang insightful
+- Actionable recommendations
+- Critical thinking
+
+Selalu berikan:
+✅ Data-driven insights
+✅ Clear methodology
+✅ Visualisasi suggestions
+✅ Practical conclusions
+
+Jawab dalam bahasa Indonesia dengan data-driven approach.`
+};
 
 // Initialize
 function init() {
     createNewChat();
+    loadSystemPrompt();
 }
 
 // Create New Chat
@@ -82,6 +150,14 @@ function renderMessages() {
     
     const messages = chats[currentChatId].messages;
     
+    // Show/hide prompt suggestions
+    const promptSuggestions = document.getElementById('promptSuggestions');
+    if (messages.length <= 1) {
+        promptSuggestions.classList.remove('hidden');
+    } else {
+        promptSuggestions.classList.add('hidden');
+    }
+    
     messages.forEach(msg => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${msg.type}`;
@@ -127,6 +203,25 @@ function renderMessages() {
     });
     
     container.scrollTop = container.scrollHeight;
+}
+
+// Use prompt suggestion
+function usePrompt(promptTemplate) {
+    const input = document.getElementById('messageInput');
+    input.value = promptTemplate;
+    input.focus();
+    
+    // Auto resize textarea
+    autoResize(input);
+    
+    // Highlight the placeholder text for easy editing
+    setTimeout(() => {
+        const bracketStart = promptTemplate.indexOf('[');
+        const bracketEnd = promptTemplate.indexOf(']') + 1;
+        if (bracketStart !== -1 && bracketEnd > bracketStart) {
+            input.setSelectionRange(bracketStart, bracketEnd);
+        }
+    }, 0);
 }
 
 // Process message untuk detect dan format code blocks
@@ -393,10 +488,13 @@ async function getAIResponse(userMessage) {
         content: m.text
     }));
 
+    // Use custom system prompt or default
+    const systemPromptToUse = customSystemPrompt || defaultSystemPrompt;
+
     const messagesToSend = [
         { 
             role: 'system', 
-            content: 'Kamu adalah AI Assistant yang membantu. Jawab dalam bahasa Indonesia.' 
+            content: systemPromptToUse
         },
         ...history,
         { 
@@ -444,6 +542,55 @@ async function getAIResponse(userMessage) {
         }
         
         throw error;
+    }
+}
+
+// System Prompt Functions
+function togglePromptEditor() {
+    const editor = document.getElementById('promptEditor');
+    editor.classList.toggle('show');
+}
+
+function loadSystemPrompt() {
+    const saved = localStorage.getItem('customSystemPrompt');
+    if (saved) {
+        customSystemPrompt = saved;
+        document.getElementById('systemPromptInput').value = saved;
+    }
+}
+
+function saveSystemPrompt() {
+    const input = document.getElementById('systemPromptInput');
+    customSystemPrompt = input.value.trim();
+    
+    if (customSystemPrompt) {
+        localStorage.setItem('customSystemPrompt', customSystemPrompt);
+        alert('✅ System prompt berhasil disimpan!');
+    } else {
+        customSystemPrompt = '';
+        localStorage.removeItem('customSystemPrompt');
+        alert('✅ System prompt direset ke default!');
+    }
+    
+    togglePromptEditor();
+}
+
+function resetSystemPrompt() {
+    if (confirm('Reset system prompt ke default?')) {
+        customSystemPrompt = '';
+        localStorage.removeItem('customSystemPrompt');
+        document.getElementById('systemPromptInput').value = '';
+        alert('✅ System prompt direset ke default!');
+    }
+}
+
+function usePreset(presetName) {
+    const preset = promptPresets[presetName];
+    if (preset) {
+        document.getElementById('systemPromptInput').value = preset;
+        customSystemPrompt = preset;
+        localStorage.setItem('customSystemPrompt', preset);
+        alert(`✅ Preset "${presetName}" berhasil diterapkan!`);
     }
 }
 
