@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       // Tentukan model ID
       let modelId;
       if (model === 'gemini-flash') {
-        modelId = 'gemini-2.0-flash-latest';
+        modelId = 'gemini-2.0-flash';
       } else if (model === 'gemini-flash-exp') {
         modelId = 'gemini-2.0-flash-exp';
       } else if (model === 'gemini-pro') {
