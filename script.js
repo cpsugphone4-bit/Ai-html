@@ -594,6 +594,63 @@ function usePreset(presetName) {
     }
 }
 
+// Custom Prompt Panel Functions
+function toggleCustomPromptPanel() {
+    const panel = document.getElementById('customPromptPanel');
+    panel.classList.toggle('show');
+    
+    // Load current prompt
+    const textarea = document.getElementById('customPromptTextarea');
+    textarea.value = customSystemPrompt || '';
+    
+    updatePromptDisplay();
+}
+
+function applyCustomPrompt() {
+    const textarea = document.getElementById('customPromptTextarea');
+    const newPrompt = textarea.value.trim();
+    
+    if (newPrompt) {
+        customSystemPrompt = newPrompt;
+        localStorage.setItem('customSystemPrompt', newPrompt);
+        alert('✅ Custom prompt berhasil diterapkan!');
+    } else {
+        customSystemPrompt = '';
+        localStorage.removeItem('customSystemPrompt');
+        alert('✅ Kembali ke default prompt!');
+    }
+    
+    updatePromptDisplay();
+    toggleCustomPromptPanel();
+}
+
+function clearCustomPrompt() {
+    if (confirm('Hapus custom prompt dan kembali ke default?')) {
+        customSystemPrompt = '';
+        localStorage.removeItem('customSystemPrompt');
+        document.getElementById('customPromptTextarea').value = '';
+        alert('✅ Custom prompt dihapus!');
+        updatePromptDisplay();
+    }
+}
+
+function applyMiniPreset(presetName) {
+    const preset = promptPresets[presetName];
+    if (preset) {
+        document.getElementById('customPromptTextarea').value = preset;
+    }
+}
+
+function updatePromptDisplay() {
+    const display = document.getElementById('currentPromptDisplay');
+    if (customSystemPrompt) {
+        const preview = customSystemPrompt.substring(0, 100) + (customSystemPrompt.length > 100 ? '...' : '');
+        display.innerHTML = `<small><strong>Current:</strong> ${preview}</small>`;
+    } else {
+        display.innerHTML = '<small>Current: Default AI Assistant</small>';
+    }
+}
+
 // Show/Hide Typing
 function showTypingIndicator() {
     isTyping = true;
@@ -906,4 +963,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     init();
+    
+    // Auto refresh untuk fix layout prompt suggestions
+    setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+    }, 100);
 });
