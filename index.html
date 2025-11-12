@@ -125,6 +125,9 @@
 
             <!-- Gemini Prompt Suggestions -->
             <div class="prompt-suggestions" id="promptSuggestions">
+                <button class="custom-prompt-btn" onclick="toggleCustomPromptPanel()" title="Custom Prompt">
+                    ⚙️
+                </button>
                 <div class="suggestion-chip" onclick="usePrompt('Jelaskan [topik] dengan bahasa sederhana dan contoh')">
                     💡 Jelaskan konsep
                 </div>
@@ -148,6 +151,39 @@
                 </div>
                 <div class="suggestion-chip" onclick="usePrompt('Translate ke [bahasa]: [text]')">
                     🌐 Translate
+                </div>
+            </div>
+
+            <!-- Custom Prompt Panel -->
+            <div class="custom-prompt-panel" id="customPromptPanel">
+                <div class="panel-header">
+                    <span>⚙️ Custom System Prompt</span>
+                    <button class="close-panel-btn" onclick="toggleCustomPromptPanel()">✕</button>
+                </div>
+                <div class="panel-content">
+                    <textarea 
+                        id="customPromptTextarea" 
+                        placeholder="Masukkan system prompt custom untuk mengubah perilaku AI..."
+                        rows="6"
+                    ></textarea>
+                    <div class="panel-actions">
+                        <button class="panel-btn apply" onclick="applyCustomPrompt()">
+                            ✓ Terapkan
+                        </button>
+                        <button class="panel-btn clear" onclick="clearCustomPrompt()">
+                            🗑️ Hapus
+                        </button>
+                    </div>
+                    <div class="panel-presets">
+                        <div class="presets-label">Preset Cepat:</div>
+                        <button class="mini-preset" onclick="applyMiniPreset('coding')">💻 Coding</button>
+                        <button class="mini-preset" onclick="applyMiniPreset('creative')">🎨 Creative</button>
+                        <button class="mini-preset" onclick="applyMiniPreset('teacher')">👨‍🏫 Teacher</button>
+                        <button class="mini-preset" onclick="applyMiniPreset('analyst')">📊 Analyst</button>
+                    </div>
+                    <div class="current-prompt-display" id="currentPromptDisplay">
+                        <small>Current: Default AI Assistant</small>
+                    </div>
                 </div>
             </div>
 
@@ -197,4 +233,4 @@
 
     <script src="script.js"></script>
 </body>
-                                                                       </html>
+                            </html>
