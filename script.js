@@ -77,6 +77,62 @@ Jawab dalam bahasa Indonesia dengan data-driven approach.`
 function init() {
     createNewChat();
     loadSystemPrompt();
+    loadPresets();
+}
+
+// Load presets from localStorage or use defaults
+function loadPresets() {
+    Object.keys(promptPresets).forEach(presetName => {
+        const saved = localStorage.getItem(`preset_${presetName}`);
+        const textarea = document.getElementById(`preset-${presetName}-text`);
+        if (textarea) {
+            textarea.value = saved || promptPresets[presetName];
+        }
+    });
+}
+
+// Toggle preset editor
+function togglePresetEdit(presetName) {
+    const editor = document.getElementById(`preset-${presetName}`);
+    const header = event.currentTarget;
+    
+    editor.classList.toggle('show');
+    header.classList.toggle('expanded');
+}
+
+// Save preset
+function savePreset(presetName) {
+    const textarea = document.getElementById(`preset-${presetName}-text`);
+    const newValue = textarea.value.trim();
+    
+    if (newValue) {
+        localStorage.setItem(`preset_${presetName}`, newValue);
+        alert(`✅ Preset "${presetName}" berhasil disimpan!`);
+    }
+}
+
+// Use edited preset
+function useEditedPreset(presetName) {
+    const textarea = document.getElementById(`preset-${presetName}-text`);
+    const presetValue = textarea.value.trim();
+    
+    if (presetValue) {
+        document.getElementById('customPromptTextarea').value = presetValue;
+        customSystemPrompt = presetValue;
+        localStorage.setItem('customSystemPrompt', presetValue);
+        alert(`✅ Preset "${presetName}" diterapkan!`);
+        updatePromptDisplay();
+    }
+}
+
+// Reset preset to default
+function resetPreset(presetName) {
+    if (confirm(`Reset preset "${presetName}" ke default?`)) {
+        const textarea = document.getElementById(`preset-${presetName}-text`);
+        textarea.value = promptPresets[presetName];
+        localStorage.removeItem(`preset_${presetName}`);
+        alert(`✅ Preset "${presetName}" direset!`);
+    }
 }
 
 // Create New Chat
