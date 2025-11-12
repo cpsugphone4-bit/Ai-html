@@ -723,8 +723,10 @@ body {
     display: flex;
     gap: 8px;
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap;
+    scroll-behavior: smooth;
 }
 
 .prompt-suggestions::-webkit-scrollbar {
@@ -738,6 +740,29 @@ body {
 .prompt-suggestions::-webkit-scrollbar-thumb {
     background: #e0e0e0;
     border-radius: 2px;
+}
+
+.custom-prompt-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-prompt-btn:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
 }
 
 .suggestion-chip {
@@ -770,6 +795,154 @@ body {
 /* Hide suggestions when chat has messages */
 .prompt-suggestions.hidden {
     display: none;
+}
+
+/* Custom Prompt Panel */
+.custom-prompt-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 2px solid #667eea;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.custom-prompt-panel.show {
+    max-height: 400px;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.close-panel-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+}
+
+.close-panel-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: rotate(90deg);
+}
+
+.panel-content {
+    padding: 20px;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+#customPromptTextarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px;
+    transition: all 0.2s;
+}
+
+#customPromptTextarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.panel-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.panel-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.panel-btn.apply {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.panel-btn.apply:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.panel-btn.clear {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.panel-btn.clear:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.panel-presets {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.presets-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.mini-preset {
+    display: inline-block;
+    margin: 4px;
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mini-preset:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.current-prompt-display {
+    margin-top: 12px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
 }
 
 .bot-avatar {
@@ -1101,9 +1274,33 @@ body {
         gap: 6px;
     }
     
+    .custom-prompt-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
     .suggestion-chip {
         padding: 8px 14px;
         font-size: 12px;
+    }
+    
+    .custom-prompt-panel.show {
+        max-height: 80vh;
+    }
+    
+    .panel-content {
+        padding: 16px;
+    }
+    
+    #customPromptTextarea {
+        font-size: 12px;
+        min-height: 100px;
+    }
+    
+    .mini-preset {
+        font-size: 11px;
+        padding: 5px 10px;
     }
 }
 
